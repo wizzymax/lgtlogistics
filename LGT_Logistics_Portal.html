@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LGT Logistics — Operations Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07080d;
+  --surface: #0e0f17;
+  --panel: #13141f;
+  --card: #181927;
+  --border: #252640;
+  --border2: #1e1f35;
+  --gold: #c9a84c;
+  --gold2: #f0c96e;
+  --red: #e05252;
+  --green: #3ecf8e;
+  --blue: #5b8dee;
+  --purple: #a78bfa;
+  --muted: #5a5b80;
+  --muted2: #8080aa;
+  --text: #e2e3f0;
+  --text2: #c0c1d8;
+  --font-h: 'Bebas Neue', sans-serif;
+  --font-b: 'Sora', sans-serif;
+  --font-m: 'JetBrains Mono', monospace;
+  --r: 6px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-b);}
+
+/* ========= LOGIN SCREEN ========= */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+#login-screen::before {
+  content:'';
+  position:absolute;inset:0;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.12), transparent),
+              radial-gradient(ellipse 40% 40% at 80% 80%, rgba(91,141,238,0.07), transparent);
+}
+.login-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.login-badge {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--bg);
+  font-family: var(--font-h);
+  font-size: 2.2rem;
+  padding: 6px 20px;
+  letter-spacing: 4px;
+  clip-path: polygon(0 0,94% 0,100% 50%,94% 100%,0 100%);
+}
+.login-sub {
+  font-family: var(--font-m);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  color: var(--muted2);
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+.login-label {
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin-bottom: 6px;
+  display: block;
+}
+.login-group { margin-bottom: 1.2rem; }
+.login-input, .login-select {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 0.9rem;
+  padding: 11px 14px;
+  outline: none;
+  border-radius: var(--r);
+  transition: border-color .2s;
+}
+.login-input:focus, .login-select:focus { border-color: var(--gold); }
+.login-select option { background: var(--panel); }
+.login-btn {
+  width: 100%;
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  font-family: var(--font-h);
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  padding: 13px;
+  cursor: pointer;
+  border-radius: var(--r);
+  transition: background .2s, transform .1s;
+  margin-top: 0.5rem;
+}
+.login-btn:hover { background: var(--gold2); transform: translateY(-1px); }
+.login-err {
+  color: var(--red);
+  font-size: 0.78rem;
+  text-align: center;
+  margin-top: 0.8rem;
+  display: none;
+}
+
+/* ========= APP SHELL ========= */
+#app { display: none; height: 100vh; flex-direction: column; }
+
+/* HEADER */
+.app-header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--gold);
+  padding: 0 1.5rem;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 50;
+}
+.h-logo { display: flex; align-items: center; gap: 12px; }
+.h-badge {
+  background: var(--gold);
+  color: var(--bg);
+  font-family: var(--font-h);
+  font-size: 1.3rem;
+  padding: 3px 12px;
+  letter-spacing: 2px;
+  clip-path: polygon(0 0,93% 0,100% 50%,93% 100%,0 100%);
+}
+.h-title {
+  font-family: var(--font-m);
+  font-size: 0.65rem;
+  letter-spacing: 2.5px;
+  color: var(--muted2);
+  text-transform: uppercase;
+}
+.h-right { display: flex; align-items: center; gap: 1.2rem; }
+.role-chip {
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold);
+  font-family: var(--font-m);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.user-chip {
+  font-size: 0.82rem;
+  color: var(--text2);
+  font-weight: 500;
+}
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted2);
+  font-family: var(--font-b);
+  font-size: 0.78rem;
+  padding: 6px 14px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: all .2s;
+}
+.logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* BODY LAYOUT */
+.app-body { display: flex; flex: 1; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+.nav-section-label {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.8rem 1.2rem 0.4rem;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 1.2rem;
+  cursor: pointer;
+  color: var(--muted2);
+  font-size: 0.83rem;
+  font-weight: 500;
+  transition: all .15s;
+  border-left: 3px solid transparent;
+  margin: 1px 0;
+}
+.nav-item:hover { background: rgba(201,168,76,0.05); color: var(--text); }
+.nav-item.active {
+  background: rgba(201,168,76,0.08);
+  color: var(--gold);
+  border-left-color: var(--gold);
+}
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+/* CONTENT */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: var(--bg);
+}
+
+/* SECTIONS */
+.dept-section { display: none; }
+.dept-section.active { display: block; }
+
+/* PAGE HEADER */
+.page-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.page-title {
+  font-family: var(--font-h);
+  font-size: 1.8rem;
+  letter-spacing: 3px;
+  color: var(--text);
+}
+.page-title span { color: var(--gold); }
+
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-top: 2px solid var(--gold);
+  padding: 1rem 1.2rem;
+  border-radius: var(--r);
+}
+.stat-label { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px; }
+.stat-val { font-family: var(--font-h); font-size: 2rem; color: var(--gold); line-height: 1; }
+.stat-sub { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+
+/* BUTTONS */
+.btn {
+  font-family: var(--font-b);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 9px 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--r);
+  transition: all .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary { background: var(--gold); color: var(--bg); }
+.btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted2); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: transparent; border: 1px solid rgba(224,82,82,0.4); color: var(--red); font-size: 0.72rem; padding: 5px 12px; }
+.btn-danger:hover { background: rgba(224,82,82,0.1); }
+.btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+.btn-comment { background: rgba(91,141,238,0.12); border: 1px solid rgba(91,141,238,0.3); color: var(--blue); font-size: 0.72rem; padding: 5px 12px; }
+.btn-comment:hover { background: rgba(91,141,238,0.2); }
+
+/* TOOLBAR */
+.toolbar { display: flex; gap: 0.8rem; margin-bottom: 1.2rem; flex-wrap: wrap; align-items: center; }
+.search-wrap { position: relative; flex: 1; min-width: 180px; }
+.search-wrap input { width: 100%; }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.85rem; pointer-events: none; }
+.search-wrap input { padding-left: 34px; }
+
+/* INPUTS */
+input[type=text], input[type=date], input[type=number], input[type=email],
+input[type=tel], select, textarea {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 0.85rem;
+  padding: 9px 12px;
+  outline: none;
+  border-radius: var(--r);
+  transition: border-color .2s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--gold); background: var(--surface); }
+select option { background: var(--panel); }
+textarea { resize: vertical; min-height: 72px; }
+
+/* FORM CARD */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  padding: 1.5rem;
+  margin-bottom: 1.2rem;
+}
+.form-sec-title {
+  font-family: var(--font-m);
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.form-sec-title::after { content:''; flex:1; height:1px; background: var(--border2); }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1/-1; }
+label { font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted2); font-weight: 500; }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border2); border-radius: var(--r); }
+table { width: 100%; border-collapse: collapse; min-width: 700px; }
+thead { background: var(--panel); }
+th {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 2px solid var(--gold);
+  white-space: nowrap;
+}
+td { padding: 10px 12px; font-size: 0.81rem; border-bottom: 1px solid var(--border2); vertical-align: top; }
+tr:hover td { background: rgba(201,168,76,0.03); }
+tr:last-child td { border-bottom: none; }
+.file-num { font-family: var(--font-m); color: var(--gold); font-weight: 600; font-size: 0.78rem; }
+.inv-num { font-family: var(--font-m); color: var(--blue); font-weight: 600; font-size: 0.78rem; }
+
+/* BADGE */
+.badge {
+  display: inline-block;
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.b-done { background: rgba(62,207,142,0.12); color: var(--green); border: 1px solid rgba(62,207,142,0.25); }
+.b-transit { background: rgba(91,141,238,0.12); color: var(--blue); border: 1px solid rgba(91,141,238,0.25); }
+.b-pend { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.25); }
+.b-issue { background: rgba(224,82,82,0.12); color: var(--red); border: 1px solid rgba(224,82,82,0.25); }
+.b-purple { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
+.b-neutral { background: rgba(255,255,255,0.05); color: var(--muted2); border: 1px solid var(--border); }
+
+/* ATTACH */
+.attach-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--r);
+  padding: 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .2s;
+  background: var(--panel);
+  position: relative;
+}
+.attach-area:hover { border-color: var(--gold); }
+.attach-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.attach-label { font-size: 0.72rem; color: var(--muted2); }
+.attach-label strong { color: var(--gold); }
+.attach-list { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.attach-chip {
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 0.68rem;
+  font-family: var(--font-m);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.attach-chip button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 0;
+}
+.attach-chip button:hover { color: var(--red); }
+
+/* COMMENTS */
+.comments-section {
+  background: rgba(91,141,238,0.04);
+  border: 1px solid rgba(91,141,238,0.15);
+  border-radius: var(--r);
+  padding: 1rem;
+  margin-top: 0.8rem;
+}
+.comment-title {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 0.7rem;
+}
+.comment-item {
+  background: var(--panel);
+  border-radius: var(--r);
+  padding: 0.7rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+.comment-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.comment-author {
+  font-family: var(--font-m);
+  font-size: 0.65rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+.comment-role {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.comment-time { font-size: 0.65rem; color: var(--muted); margin-left: auto; }
+.comment-text { color: var(--text2); line-height: 1.5; }
+.comment-add { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
+.comment-add textarea { min-height: 50px; font-size: 0.8rem; }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold);
+  padding: 2rem;
+  width: 100%;
+  max-width: 760px;
+  border-radius: var(--r);
+  position: relative;
+  margin: auto;
+  animation: fadeUp 0.25s ease;
+}
+.modal-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.modal-title { font-family: var(--font-h); font-size: 1.5rem; letter-spacing: 2px; }
+.close-x { background: none; border: none; color: var(--muted2); font-size: 1.2rem; cursor: pointer; transition: color .2s; }
+.close-x:hover { color: var(--red); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border2); }
+
+/* TOAST */
+#toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--green);
+  color: #07120e;
+  font-family: var(--font-m);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: var(--r);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .3s;
+  z-index: 999;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.err { background: var(--red); color: #fff; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 3.5rem 1rem; color: var(--muted); }
+.empty .e-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.empty p { font-size: 0.85rem; }
+
+/* ADMIN COMMENTS PANEL */
+.admin-comment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(91,141,238,0.1);
+  border: 1px solid rgba(91,141,238,0.25);
+  color: var(--blue);
+  font-size: 0.68rem;
+  font-family: var(--font-m);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.admin-comment-btn:hover { background: rgba(91,141,238,0.2); }
+
+/* Read-only notice */
+.read-only-notice {
+  background: rgba(167,139,250,0.07);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: var(--purple);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.2rem;
+}
+
+/* Attachment preview in table */
+.att-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  color: var(--gold);
+  font-family: var(--font-m);
+}
+
+/* detail expand row */
+.detail-row { display: none; }
+.detail-row.open { display: table-row; }
+.detail-row td { background: rgba(201,168,76,0.03); border-bottom: 1px solid var(--border2); }
+
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-badge">LGT</div>
+      <div class="login-sub">LOGISTICS OPERATIONS PORTAL</div>
+    </div>
+    <div class="login-group">
+      <span class="login-label">Full Name</span>
+      <input class="login-input" id="l-name" type="text" placeholder="Enter your name">
+    </div>
+    <div class="login-group">
+      <span class="login-label">Department / Role</span>
+      <select class="login-select" id="l-role">
+        <option value="">— Select your department —</option>
+        <optgroup label="ADMINISTRATION">
+          <option value="ADMIN">GM / Director of Operations (MASTER)</option>
+          <option value="ADMIN_OFFICER">Administration Officer</option>
+        </optgroup>
+        <optgroup label="OPERATIONS">
+          <option value="OPERATIONS">Operations Manager</option>
+        </optgroup>
+        <optgroup label="DECLARATIONS">
+          <option value="DECL_ARU">Declarations – Arusha</option>
+          <option value="DECL_DAR">Declarations – Dar es Salaam</option>
+        </optgroup>
+        <optgroup label="TRANSPORT">
+          <option value="TRANSPORT">Transport (OPM)</option>
+        </optgroup>
+        <optgroup label="FINANCE">
+          <option value="FINANCE">Finance / Invoices</option>
+        </optgroup>
+        <optgroup label="QUOTATIONS">
+          <option value="QUOTATIONS">Quotations</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="login-group">
+      <span class="login-label">Access PIN</span>
+      <input class="login-input" id="l-pin" type="password" placeholder="Enter department PIN" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">ACCESS PORTAL</button>
+    <div class="login-err" id="login-err">⚠ Incorrect PIN. Please try again.</div>
+    <div style="margin-top:1.2rem;font-size:0.68rem;color:var(--muted);text-align:center;font-family:var(--font-m);">
+      Default PINs → Admin: <strong style="color:var(--gold)">1234</strong> &nbsp;|&nbsp; Depts: <strong style="color:var(--gold)">0000</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" style="display:none; flex-direction:column; height:100vh;">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="h-logo">
+      <div class="h-badge">LGT</div>
+      <div class="h-title">LOGISTICS PORTAL</div>
+    </div>
+    <div class="h-right">
+      <span class="user-chip" id="h-user">—</span>
+      <span class="role-chip" id="h-role">—</span>
+      <button class="logout-btn" onclick="doLogout()">⏻ Logout</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="nav-section-label">Navigation</div>
+      <!-- items injected by JS -->
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ===== MASTER DASHBOARD (ADMIN) ===== -->
+      <div id="sec-dashboard" class="dept-section">
+        <div class="page-hdr">
+          <div class="page-title">MASTER <span>DASHBOARD</span></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Files</div><div class="stat-val" id="ms-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">In Transit</div><div class="stat-val" id="ms-transit" style="color:var(--blue)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Delivered</div><div class="stat-val" id="ms-delivered" style="color:var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Declarations Pending</div><div class="stat-val" id="ms-decl" style="color:var(--red)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Invoices Outstanding</div><div class="stat-val" id="ms-inv" style="color:var(--gold)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-val" id="ms-amt" style="font-size:1.2rem;">0</div><div class="stat-sub">cumulative</div></div>
+        </div>
+
+        <!-- All-depts overview tables -->
+        <div class="form-card">
+          <div class="form-sec-title">All Shipment Files</div>
+          <div class="toolbar">
+            <div class="search-wrap"><span class="search-icon">🔍</span><input id="adm-search" oninput="renderAdminTable()" placeholder="Search..."></div>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>File #</th><th>Date</th><th>Client</th><th>Route</th><th>Mode</th><th>Branch</th><th>Decl.</th><th>Border</th><th>Delivery</th><th>Invoice</th><th>Finance</th><th>Docs</th><th>Comment</th></tr></thead>
+              <tbody id="adm-tbody"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="adm-empty" style="display:none"><div class="e-icon">📦</div><p>No shipment files yet.</p></div>
+        </div>
+      </div>
+
+      <!-- ===== OPERATIONS / MASTER TRACKER ===== -->
+      <div id="sec-tracker" class="dept-section">
+        <div class="page-hdr">
+          <div class="page-title">SHIPMENT <span>FILES</span></div>
+          <div style="display:flex;gap:.8rem;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+            <button class="btn btn-primary" onclick="openModal('shipment-modal')">+ New File</button>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total</div><div class="stat-val" id="tr-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">In Transit</div><div class="stat-val" id="tr-transit" style="color:var(--blue)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Delivered</div><div class="stat-val" id="tr-delivered" style="color:var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">On Hold</div><div class="stat-val" id="tr-hold" style="color:var(--red)">0</div></div>
+        </div>
+        <div class="toolbar">
+          <div class="search-wrap"><span class="search-icon">🔍</span><input id="tr-search" oninput="renderTrackerTable()" placeholder="Search file, client, truck..."></div>
+          <select id="tr-filter-status" onchange="renderTrackerTable()" style="width:160px">
+            <option value="">All Status</option>
+            <option>Pending</option><option>In Transit</option><option>Delivered</option><option>On Hold</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr>
+            <th>File #</th><th>Date</th><th>Client</th><th>Route</th><th>Mode</th><th>Branch</th><th>Driver/Truck</th><th>Delivery</th><th>Invoice</th><th>Docs</th><th>Actions</th>
+          </tr></thead><tbody id="tr-tbody"></tbody></table>
+        </div>
+        <div class="empty" id="tr-empty" style="display:none"><div class="e-icon">📦</div><p>No records. Click <strong>+ New File</strong>.</p></div>
+      </div>
+
+      <!-- ===== DECLARATIONS ===== -->
+      <div id="sec-declarations" class="dept-section">
+        <div class="page-hdr">
+          <div class="page-title">DECLARATIONS <span>LOG</span></div>
+          <button class="btn btn-primary" id="decl-add-btn" onclick="openModal('decl-modal')">+ New Declaration</button>
+        </div>
+        <div id="decl-readonly-notice" class="read-only-notice" style="display:none">
+          👁 You are viewing in read-only mode. Contact your branch admin to make changes.
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr>
+            <th>File #</th><th>Client</th><th>Branch</th><th>Officer</th><th>Status</th><th>Remarks</th><th>Docs</th><th>Actions</th>
+          </tr></thead><tbody id="decl-tbody"></tbody></table>
+        </div>
+        <div class="empty" id="decl-empty" style="display:none"><div class="e-icon">📋</div><p>No declarations yet.</p></div>
+      </div>
+
+      <!-- ===== TRANSPORT ===== -->
+      <div id="sec-transport" class="dept-section">
+        <div class="page-hdr">
+          <div class="page-title">TRANSPORT <span>TRACKER</span></div>
+          <button class="btn btn-primary" onclick="openModal('trans-modal')">+ New Transport Entry</button>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Active Trucks</div><div class="stat-val" id="tp-active" style="color:var(--blue)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Delivered</div><div class="stat-val" id="tp-done" style="color:var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">At Border</div><div class="stat-val" id="tp-border" style="color:var(--gold)">0</div></div>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr>
+            <th>File #</th><th>Client</th><th>Truck Type</th><th>Truck #</th><th>Driver</th><th>Route</th><th>Border</th><th>Delivery</th><th>Date</th><th>Docs</th><th>Actions</th>
+          </tr></thead><tbody id="tp-tbody"></tbody></table>
+        </div>
+        <div class="empty" id="tp-empty" style="display:none"><div class="e-icon">🚛</div><p>No transport records yet.</p></div>
+      </div>
+
+      <!-- ===== INVOICES ===== -->
+      <div id="sec-invoices" class="dept-section">
+        <div class="page-hdr">
+          <div class="page-title">INVOICE <span>MANAGEMENT</span></div>
+          <button class="btn btn-primary" onclick="openModal('inv-modal')">+ New Invoice</button>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-val" id="inv-total" style="font-size:1.2rem;">0</div></div>
+          <div class="stat-card"><div class="stat-label">Paid</div><div class="stat-val" id="inv-paid" style="color:var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-val" id="inv-out" style="color:var(--red)">0</div></div>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr>
+            <th>Invoice #</th><th>File #</th><th>Client</th><th>Amount</th><th>Invoice Status</th><th>Finance Status</th><th>Last Update</th><th>Docs / Receipts</th><th>Actions</th>
+          </tr></thead><tbody id="inv-tbody"></tbody></table>
+        </div>
+        <div class="empty" id="inv-empty" style="display:none"><div class="e-icon">💰</div><p>No invoices yet.</p></div>
+      </div>
+
+      <!-- ===== QUOTATIONS ===== -->
+      <div id="sec-quotations" class="dept-section">
+        <div class="page-hdr">
+          <div class="page-title">QUOTATION <span>REQUESTS</span></div>
+          <button class="btn btn-primary" onclick="openModal('quot-modal')">+ New Quotation</button>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr>
+            <th>Date</th><th>Client</th><th>Contact</th><th>Route</th><th>Mode</th><th>Cargo</th><th>Quoted</th><th>Status</th><th>Docs</th><th>Actions</th>
+          </tr></thead><tbody id="quot-tbody"></tbody></table>
+        </div>
+        <div class="empty" id="quot-empty" style="display:none"><div class="e-icon">📝</div><p>No quotations yet.</p></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /app-body -->
+</div><!-- /app -->
+
+<!-- ============ MODALS ============ -->
+
+<!-- SHIPMENT -->
+<div class="modal-overlay" id="shipment-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">NEW SHIPMENT FILE</div>
+      <button class="close-x" onclick="closeModal('shipment-modal')">✕</button>
+    </div>
+    <div class="form-sec-title">Client Information</div>
+    <div class="form-grid">
+      <div class="form-group"><label>File Number *</label><input id="f-filenum" placeholder="e.g. LGT-2026-001"></div>
+      <div class="form-group"><label>Date Received *</label><input type="date" id="f-date"></div>
+      <div class="form-group"><label>Client Name *</label><input id="f-client" placeholder="Company or individual"></div>
+      <div class="form-group"><label>Client Contact</label><input id="f-contact" placeholder="+255 ..."></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Route & Cargo</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Origin</label><input id="f-origin" placeholder="e.g. Mombasa"></div>
+      <div class="form-group"><label>Entry Point</label><input id="f-entry" placeholder="e.g. Namanga, Holili"></div>
+      <div class="form-group"><label>Destination</label><input id="f-dest" placeholder="e.g. Arusha"></div>
+      <div class="form-group"><label>Branch Handling</label>
+        <select id="f-branch"><option value="">Select</option><option>Arusha</option><option>Dar es Salaam</option><option>Mombasa</option><option>Nairobi</option></select></div>
+      <div class="form-group"><label>Mode</label>
+        <select id="f-mode"><option value="">Select</option><option>Sea</option><option>Road</option><option>Air</option></select></div>
+      <div class="form-group full"><label>Cargo Description</label><textarea id="f-cargo" placeholder="Describe goods..."></textarea></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Customs</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Declaration Officer</label><input id="f-officer" placeholder="Officer name"></div>
+      <div class="form-group"><label>Declaration Status</label>
+        <select id="f-declstatus"><option value="">Select</option><option>Pending</option><option>In Progress</option><option>Cleared</option><option>Issue</option></select></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Transport</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Truck Type</label>
+        <select id="f-trucktype"><option value="">Select</option><option>Company</option><option>Hired</option></select></div>
+      <div class="form-group"><label>Truck Number</label><input id="f-trucknum" placeholder="e.g. T 123 ABC"></div>
+      <div class="form-group"><label>Driver Name</label><input id="f-driver" placeholder="Driver full name"></div>
+      <div class="form-group"><label>Border Status</label>
+        <select id="f-border"><option value="">Select</option><option>Approaching</option><option>At Border</option><option>Cleared</option><option>Crossed</option></select></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Delivery & Finance</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Delivery Status</label>
+        <select id="f-delivery"><option value="">Select</option><option>Pending</option><option>In Transit</option><option>Delivered</option><option>On Hold</option></select></div>
+      <div class="form-group"><label>Delivery Date</label><input type="date" id="f-delivdate"></div>
+      <div class="form-group"><label>Invoice Number</label><input id="f-invnum" placeholder="INV-2026-001"></div>
+      <div class="form-group"><label>Invoice Amount</label><input type="number" id="f-invamt" placeholder="0.00"></div>
+      <div class="form-group"><label>Invoice Status</label>
+        <select id="f-invstatus"><option value="">Select</option><option>Not Issued</option><option>Issued</option><option>Partial</option><option>Paid</option></select></div>
+      <div class="form-group"><label>Finance Status</label>
+        <select id="f-finstatus"><option value="">Select</option><option>Pending</option><option>Reconciled</option><option>Outstanding</option><option>Written Off</option></select></div>
+      <div class="form-group"><label>Last Client Update</label><input type="date" id="f-lastupd"></div>
+      <div class="form-group full"><label>Remarks</label><textarea id="f-remarks" placeholder="Additional notes..."></textarea></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Supporting Documents</div>
+    <div class="attach-area" id="f-attach-area" onclick="document.getElementById('f-files').click()">
+      <input type="file" id="f-files" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" onchange="handleFiles('f','shipment')" style="display:none">
+      <div class="attach-label">📎 Click to attach documents<br><strong>PDF, Images, Word, Excel</strong> supported</div>
+    </div>
+    <div class="attach-list" id="f-attach-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('shipment-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveShipment()">Save File</button>
+    </div>
+  </div>
+</div>
+
+<!-- DECLARATION -->
+<div class="modal-overlay" id="decl-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">DECLARATION ENTRY</div><button class="close-x" onclick="closeModal('decl-modal')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-group"><label>File Number</label><input id="d-filenum" placeholder="LGT-2026-..."></div>
+      <div class="form-group"><label>Client Name</label><input id="d-client"></div>
+      <div class="form-group"><label>Branch</label>
+        <select id="d-branch"><option value="">Select</option><option>Arusha</option><option>Dar es Salaam</option><option>Mombasa</option></select></div>
+      <div class="form-group"><label>Declaration Officer</label><input id="d-officer"></div>
+      <div class="form-group"><label>Declaration Status</label>
+        <select id="d-status"><option value="">Select</option><option>Pending</option><option>In Progress</option><option>Cleared</option><option>Issue</option></select></div>
+      <div class="form-group full"><label>Remarks</label><textarea id="d-remarks"></textarea></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Supporting Documents</div>
+    <div class="attach-area" onclick="document.getElementById('d-files').click()">
+      <input type="file" id="d-files" multiple onchange="handleFiles('d','decl')" style="display:none">
+      <div class="attach-label">📎 Attach declarations, permits, customs docs</div>
+    </div>
+    <div class="attach-list" id="d-attach-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('decl-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDecl()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSPORT -->
+<div class="modal-overlay" id="trans-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">TRANSPORT ENTRY</div><button class="close-x" onclick="closeModal('trans-modal')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-group"><label>File Number</label><input id="t-filenum"></div>
+      <div class="form-group"><label>Client Name</label><input id="t-client"></div>
+      <div class="form-group"><label>Truck Type</label>
+        <select id="t-trucktype"><option value="">Select</option><option>Company</option><option>Hired</option></select></div>
+      <div class="form-group"><label>Truck Number</label><input id="t-trucknum"></div>
+      <div class="form-group"><label>Driver Name</label><input id="t-driver"></div>
+      <div class="form-group"><label>Origin</label><input id="t-origin"></div>
+      <div class="form-group"><label>Destination</label><input id="t-dest"></div>
+      <div class="form-group"><label>Border Status</label>
+        <select id="t-border"><option value="">Select</option><option>Approaching</option><option>At Border</option><option>Cleared</option><option>Crossed</option></select></div>
+      <div class="form-group"><label>Delivery Status</label>
+        <select id="t-delivery"><option value="">Select</option><option>Pending</option><option>In Transit</option><option>Delivered</option><option>On Hold</option></select></div>
+      <div class="form-group"><label>Delivery Date</label><input type="date" id="t-delivdate"></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Supporting Documents</div>
+    <div class="attach-area" onclick="document.getElementById('t-files').click()">
+      <input type="file" id="t-files" multiple onchange="handleFiles('t','trans')" style="display:none">
+      <div class="attach-label">📎 Attach waybills, delivery notes, photos</div>
+    </div>
+    <div class="attach-list" id="t-attach-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('trans-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTrans()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE -->
+<div class="modal-overlay" id="inv-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">NEW INVOICE</div><button class="close-x" onclick="closeModal('inv-modal')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Invoice Number</label><input id="i-invnum" placeholder="INV-2026-001"></div>
+      <div class="form-group"><label>File Number</label><input id="i-filenum" placeholder="LGT-2026-..."></div>
+      <div class="form-group"><label>Client Name</label><input id="i-client"></div>
+      <div class="form-group"><label>Amount (TZS/USD)</label><input type="number" id="i-amount" placeholder="0.00"></div>
+      <div class="form-group"><label>Invoice Status</label>
+        <select id="i-invstatus"><option value="">Select</option><option>Not Issued</option><option>Issued</option><option>Partial</option><option>Paid</option></select></div>
+      <div class="form-group"><label>Finance Status</label>
+        <select id="i-finstatus"><option value="">Select</option><option>Pending</option><option>Reconciled</option><option>Outstanding</option><option>Written Off</option></select></div>
+      <div class="form-group"><label>Last Client Update</label><input type="date" id="i-lastupd"></div>
+      <div class="form-group full"><label>Notes</label><textarea id="i-notes" placeholder="Payment notes, bank details..."></textarea></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Receipts & Payment Proof</div>
+    <div class="attach-area" onclick="document.getElementById('i-files').click()">
+      <input type="file" id="i-files" multiple onchange="handleFiles('i','inv')" style="display:none">
+      <div class="attach-label">📎 Attach receipts, bank slips, payment confirmations<br><strong>PDF, Images</strong></div>
+    </div>
+    <div class="attach-list" id="i-attach-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('inv-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInv()">Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTATION -->
+<div class="modal-overlay" id="quot-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">NEW QUOTATION</div><button class="close-x" onclick="closeModal('quot-modal')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="q-date"></div>
+      <div class="form-group"><label>Client Name</label><input id="q-client"></div>
+      <div class="form-group"><label>Client Contact</label><input id="q-contact"></div>
+      <div class="form-group"><label>Origin</label><input id="q-origin"></div>
+      <div class="form-group"><label>Destination</label><input id="q-dest"></div>
+      <div class="form-group"><label>Mode</label>
+        <select id="q-mode"><option value="">Select</option><option>Sea</option><option>Road</option><option>Air</option></select></div>
+      <div class="form-group full"><label>Cargo Description</label><textarea id="q-cargo"></textarea></div>
+      <div class="form-group"><label>Quoted Amount</label><input type="number" id="q-amount" placeholder="0.00"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="q-status"><option value="">Select</option><option>New Request</option><option>Quoted</option><option>Accepted</option><option>Declined</option></select></div>
+    </div>
+    <div class="form-sec-title" style="margin-top:1.2rem">Supporting Documents</div>
+    <div class="attach-area" onclick="document.getElementById('q-files').click()">
+      <input type="file" id="q-files" multiple onchange="handleFiles('q','quot')" style="display:none">
+      <div class="attach-label">📎 Attach rate sheets, client requests, packing lists</div>
+    </div>
+    <div class="attach-list" id="q-attach-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('quot-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveQuot()">Save Quotation</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENT MODAL -->
+<div class="modal-overlay" id="comment-modal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-hdr">
+      <div class="modal-title">COMMENTS <span style="color:var(--gold);font-size:0.9rem" id="cm-file-label"></span></div>
+      <button class="close-x" onclick="closeModal('comment-modal')">✕</button>
+    </div>
+    <div id="cm-list" style="max-height:340px;overflow-y:auto;"></div>
+    <div id="cm-add-section">
+      <div class="comment-add" style="margin-top:1rem">
+        <textarea id="cm-text" placeholder="Add your comment or instruction..." style="flex:1"></textarea>
+        <button class="btn btn-primary btn-sm" onclick="postComment()" style="align-self:flex-end">Post</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// ROLE CONFIG
+// ============================================================
+const ROLES = {
+  ADMIN:         { label:'GM / Director', pin:'1234', sections:['dashboard','tracker','declarations','transport','invoices','quotations'], canComment:true, canEditAll:true },
+  ADMIN_OFFICER: { label:'Admin Officer', pin:'0000', sections:['tracker'], canComment:false, canEditAll:false },
+  OPERATIONS:    { label:'Operations Mgr', pin:'0000', sections:['tracker'], canComment:false, canEditAll:false },
+  DECL_ARU:      { label:'Declarations ARU', pin:'0000', sections:['declarations'], branch:'Arusha', canComment:false },
+  DECL_DAR:      { label:'Declarations DAR', pin:'0000', sections:['declarations'], branch:'Dar es Salaam', canComment:false },
+  TRANSPORT:     { label:'Transport (OPM)', pin:'0000', sections:['transport'], canComment:false },
+  FINANCE:       { label:'Finance', pin:'0000', sections:['invoices'], canComment:false },
+  QUOTATIONS:    { label:'Quotations', pin:'0000', sections:['quotations'], canComment:false },
+};
+
+const NAV_ITEMS = {
+  dashboard:    { icon:'🏠', label:'Master Dashboard' },
+  tracker:      { icon:'📦', label:'Shipment Files' },
+  declarations: { icon:'📋', label:'Declarations' },
+  transport:    { icon:'🚛', label:'Transport Tracker' },
+  invoices:     { icon:'💰', label:'Invoices' },
+  quotations:   { icon:'📝', label:'Quotations' },
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let currentRole = null;
+let currentSection = null;
+
+// Persistent data
+let records   = load('lgt-records', []);
+let decls     = load('lgt-decls', []);
+let transports= load('lgt-trans', []);
+let invoices  = load('lgt-invs', []);
+let quotations= load('lgt-quots', []);
+let comments  = load('lgt-comments', {}); // keyed by recordId
+
+// Temp file attachments (base64 per session — per form prefix)
+let tempFiles = {};
+let activeCommentId = null;
+let activeCommentDept = null;
+
+function load(k, def) { try { return JSON.parse(localStorage.getItem(k)) || def; } catch(e){ return def; } }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+
+// ============================================================
+// LOGIN
+// ============================================================
+function doLogin(){
+  const name = document.getElementById('l-name').value.trim();
+  const role = document.getElementById('l-role').value;
+  const pin  = document.getElementById('l-pin').value;
+  const err  = document.getElementById('login-err');
+
+  if(!name){ err.textContent='⚠ Please enter your name.'; err.style.display='block'; return; }
+  if(!role){ err.textContent='⚠ Please select your department.'; err.style.display='block'; return; }
+  const r = ROLES[role];
+  if(!r || pin !== r.pin){ err.style.display='block'; return; }
+  err.style.display='none';
+
+  currentUser = name;
+  currentRole = role;
+  startApp();
+}
+
+function startApp(){
+  document.getElementById('login-screen').style.display='none';
+  const app = document.getElementById('app');
+  app.style.display='flex';
+
+  document.getElementById('h-user').textContent = currentUser;
+  document.getElementById('h-role').textContent = ROLES[currentRole].label;
+
+  buildSidebar();
+  const firstSection = ROLES[currentRole].sections[0];
+  switchSection(firstSection);
+}
+
+function doLogout(){
+  currentUser = null; currentRole = null; currentSection = null;
+  tempFiles = {};
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-pin').value='';
+  document.getElementById('l-name').value='';
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function buildSidebar(){
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '<div class="nav-section-label">Menu</div>';
+  ROLES[currentRole].sections.forEach(s => {
+    const n = NAV_ITEMS[s];
+    const el = document.createElement('div');
+    el.className = 'nav-item';
+    el.id = 'nav-'+s;
+    el.innerHTML = `<span class="nav-icon">${n.icon}</span>${n.label}`;
+    el.onclick = ()=>switchSection(s);
+    sb.appendChild(el);
+  });
+}
+
+function switchSection(s){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.dept-section').forEach(d=>d.classList.remove('active'));
+  const nav = document.getElementById('nav-'+s);
+  if(nav) nav.classList.add('active');
+  document.getElementById('sec-'+s).classList.add('active');
+  currentSection = s;
+
+  if(s==='dashboard') { renderAdminTable(); updateMasterStats(); }
+  if(s==='tracker') { renderTrackerTable(); }
+  if(s==='declarations') renderDeclTable();
+  if(s==='transport') renderTransTable();
+  if(s==='invoices') renderInvTable();
+  if(s==='quotations') renderQuotTable();
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='shipment-modal') document.getElementById('f-date').value = today();
+  if(id==='quot-modal') document.getElementById('q-date').value = today();
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+function today(){ return new Date().toISOString().split('T')[0]; }
+
+// ============================================================
+// FILE ATTACHMENTS
+// ============================================================
+function handleFiles(prefix, store){
+  const input = document.getElementById(prefix+'-files');
+  if(!input) return;
+  if(!tempFiles[prefix]) tempFiles[prefix]=[];
+  Array.from(input.files).forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      tempFiles[prefix].push({ name:file.name, data:e.target.result, type:file.type, size:file.size });
+      renderAttachList(prefix);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+
+function renderAttachList(prefix){
+  const list = document.getElementById(prefix+'-attach-list');
+  if(!list) return;
+  const files = tempFiles[prefix]||[];
+  list.innerHTML = files.map((f,i)=>`
+    <div class="attach-chip">
+      ${fileIcon(f.type)} ${f.name}
+      <button onclick="removeFile('${prefix}',${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeFile(prefix, idx){
+  tempFiles[prefix].splice(idx,1);
+  renderAttachList(prefix);
+}
+
+function fileIcon(type){
+  if(!type) return '📄';
+  if(type.includes('pdf')) return '📕';
+  if(type.includes('image')) return '🖼';
+  if(type.includes('word') || type.includes('document')) return '📘';
+  if(type.includes('sheet') || type.includes('excel')) return '📗';
+  return '📄';
+}
+
+function renderStoredAttachments(files){
+  if(!files || !files.length) return '<span style="color:var(--muted);font-size:0.72rem">—</span>';
+  return files.map(f=>`<span class="att-count" title="${f.name}">📎 ${f.name.length>14?f.name.slice(0,12)+'..':f.name}</span>`).join('<br>');
+}
+
+// ============================================================
+// BADGE HELPER
+// ============================================================
+function badge(val){
+  if(!val) return '<span class="badge b-neutral">—</span>';
+  const v = val.toLowerCase();
+  if(['delivered','cleared','paid','reconciled','crossed','accepted','issued'].some(w=>v.includes(w))) return `<span class="badge b-done">${val}</span>`;
+  if(['transit','progress','approaching','border','quoted'].some(w=>v.includes(w))) return `<span class="badge b-transit">${val}</span>`;
+  if(['issue','hold','outstanding'].some(w=>v.includes(w))) return `<span class="badge b-issue">${val}</span>`;
+  if(['sea','air','road'].some(w=>v.includes(w))) return `<span class="badge b-purple">${val}</span>`;
+  return `<span class="badge b-pend">${val}</span>`;
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+(type==='err'?'err':'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ============================================================
+// COMMENTS
+// ============================================================
+function openCommentModal(recordId, dept, label){
+  activeCommentId = recordId;
+  activeCommentDept = dept;
+  document.getElementById('cm-file-label').textContent = '— '+label;
+  document.getElementById('cm-text').value='';
+  renderComments();
+  // Only ADMIN can add comments
+  document.getElementById('cm-add-section').style.display = ROLES[currentRole].canComment ? 'block':'none';
+  openModal('comment-modal');
+}
+
+function renderComments(){
+  const list = document.getElementById('cm-list');
+  const key = activeCommentDept+':'+activeCommentId;
+  const cms = comments[key]||[];
+  if(!cms.length){ list.innerHTML='<div style="color:var(--muted);font-size:0.8rem;padding:1rem 0">No comments yet.</div>'; return; }
+  list.innerHTML = '<div class="comments-section">'+
+    '<div class="comment-title">💬 Admin Comments</div>'+
+    cms.map(c=>`
+      <div class="comment-item">
+        <div class="comment-meta">
+          <span class="comment-author">${c.author}</span>
+          <span class="comment-role">${c.role}</span>
+          <span class="comment-time">${c.time}</span>
+        </div>
+        <div class="comment-text">${c.text}</div>
+      </div>`).join('')+
+    '</div>';
+}
+
+function postComment(){
+  const text = document.getElementById('cm-text').value.trim();
+  if(!text) return;
+  const key = activeCommentDept+':'+activeCommentId;
+  if(!comments[key]) comments[key]=[];
+  comments[key].push({
+    author: currentUser,
+    role: ROLES[currentRole].label,
+    text: text,
+    time: new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
+  });
+  save('lgt-comments', comments);
+  document.getElementById('cm-text').value='';
+  renderComments();
+  toast('✓ Comment posted');
+}
+
+function commentCount(dept, id){
+  const key = dept+':'+id;
+  const n = (comments[key]||[]).length;
+  return n ? `<span class="att-count" style="color:var(--blue)">💬 ${n}</span>` : '';
+}
+
+// ============================================================
+// ADMIN COMMENT BUTTON (only for admin)
+// ============================================================
+function commentBtn(dept, id, label){
+  const n = (comments[dept+':'+id]||[]).length;
+  return `<button class="admin-comment-btn" onclick="openCommentModal('${id}','${dept}','${label}')">💬 ${n>0?n+' comment'+(n>1?'s':''):'Add Comment'}</button>`;
+}
+
+// ============================================================
+// MASTER TRACKER (OPERATIONS + ADMIN)
+// ============================================================
+function saveShipment(){
+  const fn = document.getElementById('f-filenum').value.trim();
+  const cl = document.getElementById('f-client').value.trim();
+  if(!fn||!cl){ toast('File Number and Client Name are required','err'); return; }
+  const rec = {
+    id: Date.now(),
+    fileNum: fn,
+    dateReceived: document.getElementById('f-date').value,
+    clientName: cl,
+    clientContact: document.getElementById('f-contact').value,
+    origin: document.getElementById('f-origin').value,
+    entryPoint: document.getElementById('f-entry').value,
+    destination: document.getElementById('f-dest').value,
+    branch: document.getElementById('f-branch').value,
+    mode: document.getElementById('f-mode').value,
+    cargo: document.getElementById('f-cargo').value,
+    officer: document.getElementById('f-officer').value,
+    declStatus: document.getElementById('f-declstatus').value,
+    truckType: document.getElementById('f-trucktype').value,
+    truckNum: document.getElementById('f-trucknum').value,
+    driver: document.getElementById('f-driver').value,
+    borderStatus: document.getElementById('f-border').value,
+    deliveryStatus: document.getElementById('f-delivery').value,
+    deliveryDate: document.getElementById('f-delivdate').value,
+    invoiceNum: document.getElementById('f-invnum').value,
+    invoiceAmt: document.getElementById('f-invamt').value,
+    invoiceStatus: document.getElementById('f-invstatus').value,
+    financeStatus: document.getElementById('f-finstatus').value,
+    lastUpdate: document.getElementById('f-lastupd').value,
+    remarks: document.getElementById('f-remarks').value,
+    attachments: tempFiles['f']||[],
+    createdBy: currentUser,
+    createdAt: new Date().toISOString()
+  };
+  records.push(rec);
+  save('lgt-records', records);
+  tempFiles['f']=[];
+  renderAttachList('f');
+  closeModal('shipment-modal');
+  renderTrackerTable();
+  if(currentRole==='ADMIN') { renderAdminTable(); updateMasterStats(); }
+  toast('✓ Shipment file saved!');
+  clearForm(['f-filenum','f-date','f-client','f-contact','f-origin','f-entry','f-dest','f-cargo','f-officer','f-trucknum','f-driver','f-invnum','f-invamt','f-lastupd','f-remarks']);
+  clearSelects(['f-branch','f-mode','f-declstatus','f-trucktype','f-border','f-delivery','f-invstatus','f-finstatus']);
+}
+
+function renderTrackerTable(){
+  const q = (document.getElementById('tr-search')||{value:''}).value.toLowerCase();
+  const fs = (document.getElementById('tr-filter-status')||{value:''}).value;
+  let filtered = records.filter(r=>{
+    const m = !q||[r.fileNum,r.clientName,r.driver,r.truckNum,r.origin,r.destination].join(' ').toLowerCase().includes(q);
+    return m && (!fs||r.deliveryStatus===fs);
+  });
+  const tbody = document.getElementById('tr-tbody');
+  const empty = document.getElementById('tr-empty');
+  if(!filtered.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = filtered.map(r=>`<tr>
+    <td><span class="file-num">${r.fileNum}</span></td>
+    <td>${r.dateReceived||'—'}</td>
+    <td><strong>${r.clientName}</strong><br><small style="color:var(--muted)">${r.clientContact||''}</small></td>
+    <td style="white-space:nowrap">${r.origin||'—'} → ${r.destination||'—'}</td>
+    <td>${badge(r.mode)}</td>
+    <td>${r.branch||'—'}</td>
+    <td>${r.driver||'—'}<br><small style="color:var(--muted)">${r.truckNum||''}</small></td>
+    <td>${badge(r.deliveryStatus)}</td>
+    <td><span class="inv-num">${r.invoiceNum||'—'}</span><br><small style="color:var(--green)">${r.invoiceAmt?Number(r.invoiceAmt).toLocaleString():''}</small></td>
+    <td style="min-width:100px">${renderStoredAttachments(r.attachments)}</td>
+    <td><button class="btn btn-danger" onclick="deleteRecord(${r.id})">✕ Delete</button></td>
+  </tr>`).join('');
+
+  // stats
+  document.getElementById('tr-total').textContent = records.length;
+  document.getElementById('tr-transit').textContent = records.filter(r=>r.deliveryStatus==='In Transit').length;
+  document.getElementById('tr-delivered').textContent = records.filter(r=>r.deliveryStatus==='Delivered').length;
+  document.getElementById('tr-hold').textContent = records.filter(r=>r.deliveryStatus==='On Hold').length;
+}
+
+function deleteRecord(id){
+  if(!confirm('Delete this record?')) return;
+  records = records.filter(r=>r.id!==id);
+  save('lgt-records', records);
+  renderTrackerTable();
+  toast('Record deleted');
+}
+
+// ADMIN TABLE
+function renderAdminTable(){
+  const q = (document.getElementById('adm-search')||{value:''}).value.toLowerCase();
+  let filtered = records.filter(r=>!q||[r.fileNum,r.clientName,r.driver,r.truckNum].join(' ').toLowerCase().includes(q));
+  const tbody = document.getElementById('adm-tbody');
+  const empty = document.getElementById('adm-empty');
+  if(!filtered.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = filtered.map(r=>`<tr>
+    <td><span class="file-num">${r.fileNum}</span></td>
+    <td>${r.dateReceived||'—'}</td>
+    <td><strong>${r.clientName}</strong></td>
+    <td style="white-space:nowrap">${r.origin||'—'} → ${r.destination||'—'}</td>
+    <td>${badge(r.mode)}</td>
+    <td>${r.branch||'—'}</td>
+    <td>${badge(r.declStatus)}</td>
+    <td>${badge(r.borderStatus)}</td>
+    <td>${badge(r.deliveryStatus)}</td>
+    <td>${badge(r.invoiceStatus)}</td>
+    <td>${badge(r.financeStatus)}</td>
+    <td>${renderStoredAttachments(r.attachments)}</td>
+    <td>${commentBtn('tracker',r.id,r.fileNum)}</td>
+  </tr>`).join('');
+}
+
+function updateMasterStats(){
+  document.getElementById('ms-total').textContent = records.length;
+  document.getElementById('ms-transit').textContent = records.filter(r=>r.deliveryStatus==='In Transit').length;
+  document.getElementById('ms-delivered').textContent = records.filter(r=>r.deliveryStatus==='Delivered').length;
+  document.getElementById('ms-decl').textContent = decls.filter(d=>d.status==='Pending').length;
+  document.getElementById('ms-inv').textContent = invoices.filter(i=>i.finStatus==='Outstanding').length;
+  const amt = invoices.reduce((s,i)=>s+(parseFloat(i.amount)||0),0);
+  document.getElementById('ms-amt').textContent = amt.toLocaleString();
+}
+
+// ============================================================
+// DECLARATIONS
+// ============================================================
+function saveDecl(){
+  const rec = {
+    id: Date.now(),
+    fileNum: document.getElementById('d-filenum').value,
+    client: document.getElementById('d-client').value,
+    branch: document.getElementById('d-branch').value,
+    officer: document.getElementById('d-officer').value,
+    status: document.getElementById('d-status').value,
+    remarks: document.getElementById('d-remarks').value,
+    attachments: tempFiles['d']||[],
+    createdBy: currentUser
+  };
+  decls.push(rec);
+  save('lgt-decls', decls);
+  tempFiles['d']=[];
+  renderAttachList('d');
+  closeModal('decl-modal');
+  renderDeclTable();
+  toast('✓ Declaration saved!');
+  clearForm(['d-filenum','d-client','d-officer','d-remarks']);
+  clearSelects(['d-branch','d-status']);
+}
+
+function renderDeclTable(){
+  const role = ROLES[currentRole];
+  const branch = role.branch||null;
+  // Filter by branch for DECL_ARU and DECL_DAR
+  let list = decls;
+  if(branch) list = decls.filter(d=>d.branch===branch);
+
+  const tbody = document.getElementById('decl-tbody');
+  const empty = document.getElementById('decl-empty');
+  const addBtn = document.getElementById('decl-add-btn');
+  const notice = document.getElementById('decl-readonly-notice');
+
+  // ADMIN_OFFICER sees all but cannot add
+  const canEdit = ['ADMIN','DECL_ARU','DECL_DAR','OPERATIONS'].includes(currentRole);
+  if(addBtn) addBtn.style.display = canEdit?'':'none';
+  if(notice) notice.style.display = (!canEdit&&currentRole!=='ADMIN')?'flex':'none';
+
+  if(!list.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = list.map(r=>`<tr>
+    <td><span class="file-num">${r.fileNum||'—'}</span></td>
+    <td>${r.client||'—'}</td>
+    <td>${r.branch||'—'}</td>
+    <td>${r.officer||'—'}</td>
+    <td>${badge(r.status)}</td>
+    <td style="max-width:200px;white-space:pre-wrap">${r.remarks||'—'}</td>
+    <td>${renderStoredAttachments(r.attachments)}</td>
+    <td>
+      ${ROLES[currentRole].canComment ? commentBtn('decl',r.id,r.fileNum) : ''}
+      ${canEdit?`<button class="btn btn-danger" onclick="deleteDecl(${r.id})">✕</button>`:''}
+    </td>
+  </tr>`).join('');
+}
+
+function deleteDecl(id){
+  if(!confirm('Delete?')) return;
+  decls=decls.filter(r=>r.id!==id); save('lgt-decls',decls); renderDeclTable();
+}
+
+// ============================================================
+// TRANSPORT
+// ============================================================
+function saveTrans(){
+  const rec = {
+    id: Date.now(),
+    fileNum: document.getElementById('t-filenum').value,
+    client: document.getElementById('t-client').value,
+    truckType: document.getElementById('t-trucktype').value,
+    truckNum: document.getElementById('t-trucknum').value,
+    driver: document.getElementById('t-driver').value,
+    origin: document.getElementById('t-origin').value,
+    dest: document.getElementById('t-dest').value,
+    border: document.getElementById('t-border').value,
+    delivery: document.getElementById('t-delivery').value,
+    delivDate: document.getElementById('t-delivdate').value,
+    attachments: tempFiles['t']||[],
+    createdBy: currentUser
+  };
+  transports.push(rec);
+  save('lgt-trans', transports);
+  tempFiles['t']=[];
+  renderAttachList('t');
+  closeModal('trans-modal');
+  renderTransTable();
+  toast('✓ Transport record saved!');
+}
+
+function renderTransTable(){
+  const tbody = document.getElementById('tp-tbody');
+  const empty = document.getElementById('tp-empty');
+  if(!transports.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = transports.map(r=>`<tr>
+    <td><span class="file-num">${r.fileNum||'—'}</span></td>
+    <td>${r.client||'—'}</td>
+    <td>${r.truckType||'—'}</td>
+    <td><strong>${r.truckNum||'—'}</strong></td>
+    <td>${r.driver||'—'}</td>
+    <td style="white-space:nowrap">${r.origin||'—'} → ${r.dest||'—'}</td>
+    <td>${badge(r.border)}</td>
+    <td>${badge(r.delivery)}</td>
+    <td>${r.delivDate||'—'}</td>
+    <td>${renderStoredAttachments(r.attachments)}</td>
+    <td>
+      ${ROLES[currentRole].canComment?commentBtn('trans',r.id,r.fileNum):''}
+      <button class="btn btn-danger" onclick="deleteTrans(${r.id})">✕</button>
+    </td>
+  </tr>`).join('');
+
+  document.getElementById('tp-active').textContent = transports.filter(r=>r.delivery==='In Transit').length;
+  document.getElementById('tp-done').textContent = transports.filter(r=>r.delivery==='Delivered').length;
+  document.getElementById('tp-border').textContent = transports.filter(r=>r.border==='At Border').length;
+}
+
+function deleteTrans(id){ if(!confirm('Delete?')) return; transports=transports.filter(r=>r.id!==id); save('lgt-trans',transports); renderTransTable(); }
+
+// ============================================================
+// INVOICES
+// ============================================================
+function saveInv(){
+  const rec = {
+    id: Date.now(),
+    invNum: document.getElementById('i-invnum').value,
+    fileNum: document.getElementById('i-filenum').value,
+    client: document.getElementById('i-client').value,
+    amount: document.getElementById('i-amount').value,
+    invStatus: document.getElementById('i-invstatus').value,
+    finStatus: document.getElementById('i-finstatus').value,
+    lastUpd: document.getElementById('i-lastupd').value,
+    notes: document.getElementById('i-notes').value,
+    attachments: tempFiles['i']||[],
+    createdBy: currentUser
+  };
+  invoices.push(rec);
+  save('lgt-invs', invoices);
+  tempFiles['i']=[];
+  renderAttachList('i');
+  closeModal('inv-modal');
+  renderInvTable();
+  toast('✓ Invoice saved!');
+}
+
+function renderInvTable(){
+  const tbody = document.getElementById('inv-tbody');
+  const empty = document.getElementById('inv-empty');
+  if(!invoices.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = invoices.map(r=>`<tr>
+    <td><span class="inv-num">${r.invNum||'—'}</span></td>
+    <td><span class="file-num">${r.fileNum||'—'}</span></td>
+    <td>${r.client||'—'}</td>
+    <td style="color:var(--green);font-family:var(--font-m)">${r.amount?Number(r.amount).toLocaleString():'—'}</td>
+    <td>${badge(r.invStatus)}</td>
+    <td>${badge(r.finStatus)}</td>
+    <td>${r.lastUpd||'—'}</td>
+    <td style="min-width:120px">${renderStoredAttachments(r.attachments)}</td>
+    <td>
+      ${ROLES[currentRole].canComment?commentBtn('inv',r.id,r.invNum||r.fileNum):''}
+      <button class="btn btn-danger" onclick="deleteInv(${r.id})">✕</button>
+    </td>
+  </tr>`).join('');
+
+  const total = invoices.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  document.getElementById('inv-total').textContent = total.toLocaleString();
+  document.getElementById('inv-paid').textContent = invoices.filter(r=>r.invStatus==='Paid').length;
+  document.getElementById('inv-out').textContent = invoices.filter(r=>r.finStatus==='Outstanding').length;
+}
+
+function deleteInv(id){ if(!confirm('Delete?')) return; invoices=invoices.filter(r=>r.id!==id); save('lgt-invs',invoices); renderInvTable(); }
+
+// ============================================================
+// QUOTATIONS
+// ============================================================
+function saveQuot(){
+  const rec = {
+    id: Date.now(),
+    date: document.getElementById('q-date').value,
+    client: document.getElementById('q-client').value,
+    contact: document.getElementById('q-contact').value,
+    origin: document.getElementById('q-origin').value,
+    dest: document.getElementById('q-dest').value,
+    mode: document.getElementById('q-mode').value,
+    cargo: document.getElementById('q-cargo').value,
+    amount: document.getElementById('q-amount').value,
+    status: document.getElementById('q-status').value,
+    attachments: tempFiles['q']||[],
+    createdBy: currentUser
+  };
+  quotations.push(rec);
+  save('lgt-quots', quotations);
+  tempFiles['q']=[];
+  renderAttachList('q');
+  closeModal('quot-modal');
+  renderQuotTable();
+  toast('✓ Quotation saved!');
+}
+
+function renderQuotTable(){
+  const tbody = document.getElementById('quot-tbody');
+  const empty = document.getElementById('quot-empty');
+  if(!quotations.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = quotations.map(r=>`<tr>
+    <td>${r.date||'—'}</td>
+    <td><strong>${r.client||'—'}</strong></td>
+    <td>${r.contact||'—'}</td>
+    <td style="white-space:nowrap">${r.origin||'—'} → ${r.dest||'—'}</td>
+    <td>${badge(r.mode)}</td>
+    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${r.cargo||'—'}</td>
+    <td style="color:var(--green);font-family:var(--font-m)">${r.amount?Number(r.amount).toLocaleString():'—'}</td>
+    <td>${badge(r.status)}</td>
+    <td>${renderStoredAttachments(r.attachments)}</td>
+    <td>
+      ${ROLES[currentRole].canComment?commentBtn('quot',r.id,r.client):''}
+      <button class="btn btn-danger" onclick="deleteQuot(${r.id})">✕</button>
+    </td>
+  </tr>`).join('');
+}
+
+function deleteQuot(id){ if(!confirm('Delete?')) return; quotations=quotations.filter(r=>r.id!==id); save('lgt-quots',quotations); renderQuotTable(); }
+
+// ============================================================
+// CSV EXPORT
+// ============================================================
+function exportCSV(){
+  if(!records.length){ toast('No records to export','err'); return; }
+  const headers = ['File #','Date','Client','Contact','Origin','Entry','Destination','Branch','Mode','Cargo','Officer','Decl Status','Truck Type','Truck #','Driver','Border','Delivery','Deliv Date','Invoice #','Amount','Inv Status','Finance','Last Update','Remarks','Created By'];
+  const rows = records.map(r=>[r.fileNum,r.dateReceived,r.clientName,r.clientContact,r.origin,r.entryPoint,r.destination,r.branch,r.mode,r.cargo,r.officer,r.declStatus,r.truckType,r.truckNum,r.driver,r.borderStatus,r.deliveryStatus,r.deliveryDate,r.invoiceNum,r.invoiceAmt,r.invoiceStatus,r.financeStatus,r.lastUpdate,r.remarks,r.createdBy].map(v=>`"${(v||'').replace(/"/g,'""')}"`));
+  const csv = [headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = `LGT_Tracker_${today()}.csv`;
+  a.click();
+  toast('✓ CSV exported!');
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function clearForm(ids){ ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); }
+function clearSelects(ids){ ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.selectedIndex=0; }); }
+
+// Init clock
+function clock(){
+  const now=new Date();
+  // nothing to show in this version, header already clean
+}
+setInterval(clock,1000);
+</script>
+</body>
+</html>
